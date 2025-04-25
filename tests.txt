@@ -1,0 +1,10 @@
+# Transação de crédito
+curl http://localhost:3000/clients -H "Content-Type: application/json"
+
+curl http://localhost:3000/clients/1 -H "Content-Type: application/json"
+
+curl http://localhost:3000/clients/1/transactions -H "Content-Type: application/json"
+
+curl -X POST http://localhost:3000/clients -H "Content-Type: application/json" -d '{"balance": 100, "limit": 10000}'
+
+curl -X POST http://localhost:3000/clients/1/transactions -H "Content-Type: application/json" -d '{"value": 1000, "transaction_type": "d", "description": "test"}'

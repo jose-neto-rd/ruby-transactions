@@ -5,19 +5,19 @@ class TransactionTest < ActiveSupport::TestCase
     @client = Client.new(limit: 1000, balance: 0)
   end
 
-  test "must be valid" do
+  test "#new > when params are right transaction is valid" do
     transaction = @client.transactions.new(value: 1000, transaction_type: "d", description: "test")
 
     assert transaction.valid?
   end
 
-  test "must be invalid" do
+  test "#new > when limit is nil transaction is invalid" do
     transaction = @client.transactions.new(value: 1000, transaction_type: "aa", description: "test")
 
     assert_not transaction.valid?
   end
 
-  test "must transaction d execute properlly" do
+  test "#execute > debit transaction must execute properlly" do
     expected = -100
     transaction = @client.transactions.new(value: 100, transaction_type: "d", description: "test")
 
@@ -26,7 +26,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal expected, @client.balance
   end
 
-  test "must transaction c execute properlly" do
+  test "#execute > credit transaction must execute properlly" do
     expected = 100
     transaction = @client.transactions.new(value: 100, transaction_type: "c", description: "test")
 
@@ -35,7 +35,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal expected, @client.balance
   end
 
-  test "must transaction not execute by invalid type" do
+  test "#execute > must raise an error when type is not valid" do
     transaction = @client.transactions.new(value: 1000, transaction_type: "aa", description: "test")
     expected = "Inválid transaction type: #{transaction.transaction_type}. Use 'c' or 'd'"
 
@@ -46,7 +46,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal expected, exception.message
   end
 
-  test "must transaction not execute by invalid limit" do
+  test "#execute > must raise an error when limit is invalid" do
     expected = "Value surpass limit: #{@client.limit}"
     transaction = @client.transactions.new(value: 1001, transaction_type: "d", description: "test")
 

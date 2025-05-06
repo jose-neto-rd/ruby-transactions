@@ -1,4 +1,4 @@
-class ClientsController < ActionController::API
+class ClientsController < ApplicationController
   def index
     render json: Client.all
   end
@@ -20,13 +20,15 @@ class ClientsController < ActionController::API
   end
 
   def show
-    client = Client.find(params[:id])
+    client = find_client
+    return unless client
+
     render json: {
       limit: client.limit,
       balance: client.balance
     }, status: :ok
   rescue ActiveRecord::RecordNotFound
-    render json: { error: "Client not found!" }, status: :not_found
+    render_client_not_found
   end
 
   private
@@ -36,12 +38,6 @@ class ClientsController < ActionController::API
   end
 
   def render_unprocessable_entity(errors = nil)
-    error_message = if errors&.full_messages&.any?
-      "Client not created: #{errors.full_messages.join(', ')}!"
-    else
-      "Client not created!"
-    end
-
-    render json: { error: error_message }, status: :unprocessable_entity
+    render_validation_errors("Client not created", errors)
   end
 end

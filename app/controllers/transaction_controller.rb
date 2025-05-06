@@ -1,7 +1,7 @@
-class TransactionController < ActionController::API
+class TransactionController < ApplicationController
   def index
-    client = Client.find_by(id: params[:id])
-    return render_not_found unless client
+    client = find_client
+    return unless client
 
     render json: client.transactions
   rescue ActiveRecord::RecordInvalid => e
@@ -9,8 +9,8 @@ class TransactionController < ActionController::API
   end
 
   def create
-    client = Client.find_by(id: params[:id])
-    return render_not_found unless client
+    client = find_client
+    return unless client
 
     transaction = client.transactions.new(transaction_params)
     if transaction.invalid?
@@ -39,19 +39,7 @@ class TransactionController < ActionController::API
     params.permit(:value, :transaction_type, :description)
   end
 
-  def render_not_found
-    render json: { error: "Client not found!" }, status: :not_found
-  end
-
   def render_unprocessable_entity(errors = nil)
-    error_message = if errors.is_a?(Array)
-      "Transaction could not be processed: #{errors.join(', ')}!"
-    elsif errors&.full_messages&.any?
-      "Transaction could not be processed: #{errors.full_messages.join(', ')}!"
-    else
-      "Transaction could not be processed!"
-    end
-
-    render json: { error: error_message }, status: :unprocessable_entity
+    render_validation_errors("Transaction could not be processed", errors)
   end
 end
